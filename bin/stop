@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+# stop — stop the running app. Used by bin/restart and bin/reload; also useful
+# standalone. Prefers the pidfile written by run / start, and falls back to
+# freeing whatever is listening on $PORT.
+#
+# When the app is managed by the fleet, prefer the dashboard's "■ stop app"
+# button; this is the CLI equivalent.
+cd "$(dirname "$0")"
+. ./_common.sh
+
+stop_running
