@@ -7,8 +7,11 @@
 # The fleet force-syncs the workspace, injects PORT / BASE_PATH / DATABASE_URL,
 # launches this detached in its own process group, and health-checks the port.
 # Never start a dev server here — HMR chunks 404 behind the ingress.
-cd "$(dirname "$0")"
-. ./_common.sh
+# fleet.conf's commands are written relative to the REPO ROOT, so run them from
+there — not from bin/, where this script lives. _common.sh resolves FLEET_ROOT
+from its own location, so it is sourced by path before the cd.
+. "$(dirname "$0")/_common.sh"
+cd "$FLEET_ROOT"
 
 step install "$INSTALL_CMD"
 step build "$BUILD_CMD"

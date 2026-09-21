@@ -6,8 +6,11 @@
 # reload, or `docker compose up -d --no-build`), that runs. Otherwise this falls
 # back to a no-build restart: stop + start (reuses existing build artifacts).
 # This is the fast path when only env / config changed, not code.
-cd "$(dirname "$0")"
-. ./_common.sh
+# fleet.conf's commands are written relative to the REPO ROOT, so run them from
+there — not from bin/, where this script lives. _common.sh resolves FLEET_ROOT
+from its own location, so it is sourced by path before the cd.
+. "$(dirname "$0")/_common.sh"
+cd "$FLEET_ROOT"
 
 if [ -n "$RELOAD_CMD" ]; then
   echo "fleet: [reload] $RELOAD_CMD"

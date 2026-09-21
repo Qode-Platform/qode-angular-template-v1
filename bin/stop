@@ -6,7 +6,10 @@
 #
 # When the app is managed by the fleet, prefer the dashboard's "■ stop app"
 # button; this is the CLI equivalent.
-cd "$(dirname "$0")"
-. ./_common.sh
+# fleet.conf's commands are written relative to the REPO ROOT, so run them from
+there — not from bin/, where this script lives. _common.sh resolves FLEET_ROOT
+from its own location, so it is sourced by path before the cd.
+. "$(dirname "$0")/_common.sh"
+cd "$FLEET_ROOT"
 
 stop_running
