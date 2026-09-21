@@ -23,11 +23,12 @@ FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
 ARG BUILD_ID=""
 ENV PORT=8080 BUILD_ID=$BUILD_ID
 COPY --from=build /app/dist/angular/browser /usr/share/nginx/html
-# nginx-unprivileged runs as uid 101, which cannot write /etc/nginx/templates.
-# The fleet's static stack pack has this same RUN without the switch, so it
-# fails the same way; drop to root for the write and hand the image back.
+# /etc/nginx/templates does NOT exist in nginx-unprivileged:1.27-alpine, and
+# the default uid 101 cannot create it under /etc/nginx — so this needs both a
+# mkdir and root. The fleet's static stack pack writes straight to that path
+# and fails with "can't create ...: nonexistent directory".
 USER root
-RUN printf 'server {\n  listen ${PORT};\n  root /usr/share/nginx/html;\n  location / { try_files $uri $uri/ /index.html; }\n}\n' \
+RUN mkdir -p /etc/nginx/templates && printf 'server {\n  listen ${PORT};\n  root /usr/share/nginx/html;\n  location / { try_files $uri $uri/ /index.html; }\n}\n' \
     > /etc/nginx/templates/default.conf.template
 USER 101
 EXPOSE 8080
