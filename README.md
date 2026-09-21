@@ -29,6 +29,17 @@ trusting it.
 
 Listens on `$PORT` (default `3000`); health check hits `/`.
 
+## BASE_PATH
+
+The fleet injects `BASE_PATH` (`/direct/<agent>:<port>`) and nginx forwards
+that prefix **unchanged** — so this app serves every route and asset under
+it. An empty or unset value means standalone mode: serve at the host root.
+
+- `ng build --base-href`, then the output is STAGED under the prefix by scripts/fleet-build.sh.
+- `HEALTH_PATH` in `fleet.conf` stays un-prefixed; the fleet prepends `$BASE_PATH` itself.
+- A value like `direct/x:3000/` is normalised to `/direct/x:3000`.
+- Angular emits a flat dist/ and `serve` has no prefix option, so the build stages the app under .fleet-www$BASE_PATH/ and writes a serve.json rewrite so deep-link refreshes resolve.
+
 ## What differs from stock output
 
 - Added `serve` to devDependencies — Angular ships no production static server and the fleet needs one listening on $PORT.
