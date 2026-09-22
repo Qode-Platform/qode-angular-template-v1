@@ -106,3 +106,45 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Rule: everything under BASE_PATH
+
+This app is not served at the host root. The fleet ingress serves it under a
+proxy prefix and forwards that prefix **unchanged**:
+
+```
+BASE_PATH=/direct/<agent>:<port>
+```
+
+**Every API call and every asset reference must carry that base path.** A bare
+`"/..."` literal resolves against the host root, so it works on localhost and
+404s in the fleet.
+
+**What Angular rewrites for you:** only `<base href>` in `src/index.html`,
+which the build overwrites via `--base-href` (`scripts/fleet-build.sh` derives
+it from `BASE_PATH`). The browser resolves **relative** URLs against it, and
+`RouterLink` resolves against `APP_BASE_HREF`. That is the whole list.
+
+**What is NOT rewritten:** `HttpClient`/`fetch`/XHR URLs, absolute `src="/..."`
+and `href="/..."` literals in templates (an absolute path ignores `<base href>`
+completely), and CSS `url("/...")`.
+
+**Use this framework's mechanism:** the build's `--base-href`. In practice that
+means writing URLs **relative** (no leading slash), or reading the base href
+back explicitly:
+
+```ts
+import { APP_BASE_HREF } from '@angular/common';
+
+const base = inject(APP_BASE_HREF);   // e.g. "/direct/agent-x:3000/"
+this.http.get(`${base}api/items`);
+```
+
+**Verify with:**
+
+```bash
+npm run check:base-path
+```
+
+A line that is genuinely framework-handled can be exempted with a trailing
+`base-path-ok` comment (say why).
