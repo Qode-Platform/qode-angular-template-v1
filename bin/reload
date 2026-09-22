@@ -18,5 +18,5 @@ if [ -n "$RELOAD_CMD" ]; then
 else
   echo "fleet: no RELOAD_CMD defined — doing a no-build restart (stop + start)."
   stop_running
-  exec ./start
+  exec "$FLEET_ROOT/bin/start"
 fi

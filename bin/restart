@@ -13,4 +13,4 @@
 cd "$FLEET_ROOT"
 
 stop_running
-exec ./run
+exec "$FLEET_ROOT/bin/run"
