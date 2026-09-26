@@ -10,7 +10,6 @@ out
 .svelte-kit
 .astro
 .output
-.fleet-www
 coverage
 .env
 .env.*

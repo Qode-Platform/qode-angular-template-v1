@@ -2,7 +2,7 @@
 #
 # Shared helpers for the fleet lifecycle scripts (bin/run bin/start bin/restart
 # bin/reload bin/stop). Sourced, not executed. Resolves the runtime contract the
-# fleet injects (PORT / BASE_PATH / DATABASE_URL) and loads the per-project
+# fleet injects (PORT / DATABASE_URL) and loads the per-project
 # commands from fleet.conf (at the repo root) — so the lifecycle scripts stay
 # project- and language-agnostic and only fleet.conf needs editing per project.
 #
@@ -40,8 +40,6 @@ _ENV_PORT="${PORT:-}"
 # --- runtime contract --------------------------------------------------------
 # Precedence for PORT: fleet-injected env > fleet.conf > 3000.
 export PORT="${_ENV_PORT:-${PORT:-3000}}"
-# BASE_PATH is fleet-injected only; empty when running standalone (domain root).
-export BASE_PATH="${BASE_PATH:-}"
 
 # Run a command in the foreground (install / build steps). Skips cleanly when
 # empty so a project can omit e.g. a build step.
@@ -65,7 +63,7 @@ exec_step() { # $1=label  $2=command
     echo "fleet: set ${label^^}_CMD in $CONF" >&2
     exit 1
   fi
-  echo "fleet: starting $NAME  (port=$PORT base_path=${BASE_PATH:-/})"
+  echo "fleet: starting $NAME  (port=$PORT)"
   echo "fleet: [$label] $cmd"
   echo $$ > "$PIDFILE"
   exec bash -c "$cmd"

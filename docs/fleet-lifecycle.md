@@ -7,7 +7,7 @@ managed by the fleet platform. It gives any app — Node, Python, Go, a Docker
 Compose stack, anything — a uniform way to be deployed and controlled, without
 the fleet needing to know a single thing about your stack.
 
-The fleet injects runtime variables into the environment (`PORT`, `BASE_PATH`,
+The fleet injects runtime variables into the environment (`PORT`,
 `DATABASE_URL`) and calls `./bin/run` to deploy. Everything project-specific —
 how to install, build, and start your app — lives in **one file: `fleet.conf`**.
 That is the only file you edit per project.
@@ -42,8 +42,8 @@ START_CMD='node dist/server.js'   # must listen on $PORT; run in foreground
 RELOAD_CMD=''           # optional; empty → falls back to stop+start
 ```
 
-> **Critical rule:** single-quote any command that uses `$PORT` or
-> `$BASE_PATH`. Single quotes defer variable expansion to **runtime** — when the
+> **Critical rule:** single-quote any command that uses `$PORT`. Single
+> quotes defer variable expansion to **runtime** — when the
 > command actually runs, with the fleet-injected value — rather than at the
 > moment `fleet.conf` is sourced (when those values aren't set yet). Use
 > `START_CMD='gunicorn app:app --bind 0.0.0.0:$PORT'`, never double quotes.
@@ -115,9 +115,11 @@ curl http://localhost:3001/   # should 200
 
 ### Step 5 — Connect to the fleet
 
-Point the fleet at your repo. It will clone it, inject `PORT` / `BASE_PATH` /
+Point the fleet at your repo. It will clone it, inject `PORT` /
 `DATABASE_URL`, and call `bin/run`. As long as your `START_CMD` listens on
 `$PORT` and `HEALTH_PATH` returns 200, the fleet will mark the app healthy.
+The app is served at the root (`/`) of its own hostname, so it needs no path
+prefix.
 
 ## Key Invariants
 
